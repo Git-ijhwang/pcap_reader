@@ -1,0 +1,10 @@
+# Rust build
+/target
+
+# Cargo
+**/Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
