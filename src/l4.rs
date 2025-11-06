@@ -1,7 +1,7 @@
 use crate::port::*;
 
 
-pub fn parse_tcp(tcp: &[u8])
+pub fn parse_tcp(tcp: &[u8]) -> u16
 {
     if tcp.len() < 20 {
         println!( "TCP header too short");
@@ -51,9 +51,10 @@ pub fn parse_tcp(tcp: &[u8])
         if rst{"RST "} else {""},
     );
 
+    dst_port
 }
 
-fn parse_udp(udp: &[u8])
+fn parse_udp(udp: &[u8]) -> u16
 {
     let mut pos = 0;
 
@@ -90,16 +91,19 @@ fn parse_udp(udp: &[u8])
         src_port, str_src_port, dst_port, str_dst_port, len, chksum);
 
     println!("{}", print);
+
+    dst_port
 }
 
-pub fn preparse_layer4(proto_num:usize, l4: &[u8])
+pub fn preparse_layer4(proto_num:usize, l4: &[u8]) -> u16
 {
     match proto_num {
         6   => parse_tcp(l4),
         17  => parse_udp(l4),
-        1   => println!("ICMP"),
-        _   => println!("IP proto {}", proto_num)
-    };
-
-    // proto
+        // 1   => println!("ICMP"),
+        _   => {
+            println!("IP proto {}", proto_num);
+            0
+        }
+    }
 }

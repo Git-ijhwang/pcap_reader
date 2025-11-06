@@ -12,6 +12,8 @@ use ipv6::*;
 mod l4;
 use l4::*;
 mod port;
+mod gtp;
+use gtp::*;
 
 pub const IP_HDR_LEN:usize = 20;
 pub const MIN_ETH_HDR_LEN:usize = 14;
@@ -123,9 +125,17 @@ fn main()
         next_type = v.unwrap();
 
         //Parse Layer 4
-        preparse_layer4(next_type,
+        let protocol = preparse_layer4(next_type,
                          &packet.data[(MIN_ETH_HDR_LEN+IP_HDR_LEN)..]);
 
         idx += 1;
+
+
+        match protocol {
+            2123 => match parse_gtpc(packet.data) {
+                        Ok((_rest, h)) => println!("{:#?}", h),
+                        Err(e) => println!("ERR {:?}", e),
+            }
+        }
     }
 }
