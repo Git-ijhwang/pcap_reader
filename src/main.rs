@@ -12,6 +12,7 @@ use ipv6::*;
 mod l4;
 use l4::*;
 mod port;
+mod gtpv2_types;
 mod gtp;
 use gtp::*;
 
