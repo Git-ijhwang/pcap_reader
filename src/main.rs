@@ -130,12 +130,22 @@ fn main()
 
         idx += 1;
 
-
         match protocol {
-            2123 => match parse_gtpc(packet.data) {
-                        Ok((_rest, h)) => println!("{:#?}", h),
-                        Err(e) => println!("ERR {:?}", e),
+            2123 => {
+                match parse_gtpc(packet.data) {
+                    Ok((_rest, hdr)) =>  {
+                        println!("{:#?}", hdr);
+
+                        let ies: Vec<GtpIe> = parse_all_ies(hdr.payload);
+                        for ie in ies {
+                            println!("IE: Type:{}, len:{}, inst:{}", ie.ie_type, ie.length, ie.instance);
+                        }
+                    }
+                    Err(e) => println!("ERR {:?}", e),
+                }
             }
+            _ => {}
         }
+
     }
 }
