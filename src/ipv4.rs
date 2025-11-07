@@ -40,7 +40,7 @@ pub fn parse_ipv4(ip_hdr: &[u8], short:bool) -> usize
     offset += 1; //Time to Live (1byte)
 
     next_hdr = ip_hdr[offset] as usize;
-    let mut str_proto = "".to_string();
+    let mut str_proto = String::new();
     if let Some(v) = protocol_to_str(next_hdr) {
         str_proto = v;
     }
@@ -56,7 +56,7 @@ pub fn parse_ipv4(ip_hdr: &[u8], short:bool) -> usize
     offset += 2; //Header Checksum Field (2bytes)
 
     let mut src_addr = Ipv4Addr::new(0,0,0,0);
-    if let Ok(octets) = ip_hdr[offset..offset+3].try_into() {
+    if let Ok(octets) = ip_hdr[offset..offset+4].try_into() {
         src_addr = Ipv4Addr::from_octets(octets);
     }
     else {
@@ -65,7 +65,7 @@ pub fn parse_ipv4(ip_hdr: &[u8], short:bool) -> usize
     offset += 4;
 
     let mut dst_addr = Ipv4Addr::new(0,0,0,0);
-    if let Ok(octets) = ip_hdr[offset..offset+3].try_into() {
+    if let Ok(octets) = ip_hdr[offset..offset+4].try_into() {
         dst_addr = Ipv4Addr::from_octets(octets);
     }
     else {
@@ -75,7 +75,6 @@ pub fn parse_ipv4(ip_hdr: &[u8], short:bool) -> usize
     let mut ip_print = "".to_string();
     if short {
         ip_print = format!("\tIP\tSrc: {}  Dst:{}", src_addr, dst_addr);
-
     }
     else {
         ip_print = format!("\tIP\tVer:{}\n\t\tLen:{}bytes\n\t\tTotalLen:{}bytes\n\t\tID:0x{:04x}\n\t\tF:0x{:02x}\n\t\tTTL:{} \n\t\tNext_Proto:{}[{}]\n\t\tChkSum: 0x{:04x}\n\t\tSrc Addr:{}\n\t\tDst Addr: {}",

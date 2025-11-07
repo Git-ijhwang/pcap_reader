@@ -98,7 +98,24 @@ pub fn parse_gtpc(input: &[u8]) -> IResult<&[u8], GtpHeader>
         (input, None)
     };
 
-    let (remaining, payload) = take(msg_len as usize)(input)?;
+    let (input, spare) = be_u8(input)?;
+
+    let mut add = 0;
+    if !teid.is_none() {
+        add += 4;
+    }
+    add += (4);
+    let (remaining, payload) = take((msg_len-add) as usize)(input)?;
+
+    let mut print = format!("\tGTP \tMessage Type: {} ({})\n", GTPV2_MSG_TYPES[msg_type as usize], msg_type);
+    print.push_str(&format!("\t\tMessage Length: {}\n", msg_len));
+    print.push_str(&format!("\t\tP_Flag: {}, T_Flag: {}\n", p_flag, t_flag));
+    if t_flag {
+        print.push_str(&format!("\t\tTunnel Endpoint: 0x{:x}\n", teid.unwrap()));
+    }
+    print.push_str(&format!("\t\tSequence Number: 0x{:x}\n", seq));
+
+    println!("{}", print);
 
     Ok (( remaining, GtpHeader {
         version,

@@ -13,6 +13,7 @@ mod l4;
 use l4::*;
 mod port;
 mod gtpv2_types;
+use gtpv2_types::*;
 mod gtp;
 use gtp::*;
 
@@ -131,15 +132,26 @@ fn main()
 
         idx += 1;
 
+        let mut l4_len = 0;
+
+        if next_type == 17 {
+            l4_len = 8;
+        }
+        else if next_type == 6 {
+            l4_len = 20;
+        }
+
         match protocol {
             2123 => {
-                match parse_gtpc(packet.data) {
+                match parse_gtpc(&packet.data[(MIN_ETH_HDR_LEN+IP_HDR_LEN+l4_len)..]) {
                     Ok((_rest, hdr)) =>  {
-                        println!("{:#?}", hdr);
+                        // println!("{:#?}", hdr);
 
                         let ies: Vec<GtpIe> = parse_all_ies(hdr.payload);
                         for ie in ies {
-                            println!("IE: Type:{}, len:{}, inst:{}", ie.ie_type, ie.length, ie.instance);
+                            println!("IE: Type:{}({}), len:{}, inst:{}",
+                            GTPV2_IE_TYPES[ie.ie_type as usize],
+                            ie.ie_type , ie.length, ie.instance);
                         }
                     }
                     Err(e) => println!("ERR {:?}", e),

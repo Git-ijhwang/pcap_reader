@@ -42,8 +42,7 @@ pub fn parse_tcp(tcp: &[u8]) -> u16
 
     println!(
         "\tSrc:{}[{}]\tDst:{}[{}]\tSeq:{}, Ack:{}, Win:{}, ChkSum:0x{:04x} Flags:[{}{}{}{}]",
-        src_port, str_src_port,
-        dst_port, str_dst_port,
+        src_port, str_src_port, dst_port, str_dst_port,
         seq_num, ack_num, win_size, chksum,
         if syn{"SYN "} else {""},
         if ack{"ACK "} else {""},
